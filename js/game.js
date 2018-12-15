@@ -4,8 +4,8 @@ var ctx = canvas.getContext("2d");
 var x = 15;
 var y = canvas.height-10;
 
-var dx = 2;
-var dy = -2;
+var dx = .8;
+var dy = -.8;
 
 var ballRadius = 10;
 
@@ -34,26 +34,67 @@ function drawPaddle()
     ctx.closePath();
 }
 
+function keyDownHandler(e)
+{
+    if (e.keyCode == 39) {
+        rightPressed = true;
+    }
+    else if (e.keyCode == 37) {
+        leftPressed = true;
+    }
+}
+
+function keyUpHandler(e)
+{
+    if (e.keyCode == 39) {
+        rightPressed = false;
+    }
+    else if (e.keyCode == 37) {
+        leftPressed = false;
+    }
+}
+
 function draw() 
 {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw game objects
     drawBall();
     drawPaddle();
 
     // Bounce off left / right walls
-    if (x + dx > canvas.width-ballRadius || x + dx < ballRadius)
-    {
+    if (x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
         dx = -dx;
     }
 
-    // Bounce off top / bottom walls
-    if (y + dy > canvas.height-ballRadius || y + dy < ballRadius)
-    {
+    // Bounce off top wall
+    if (y + dy < ballRadius) {
         dy = -dy;
+    }
+    else if (y + dy > canvas.height-ballRadius) {
+        if (x > paddleX && x < paddleX + paddleWidth) {
+            dy = -dy;
+        }
+        else {
+            alert("Game over");
+            document.location.reload();
+        }
+    }
+
+    // Paddle movement 
+    if (rightPressed && paddleX < canvas.width-paddleWidth) {
+        paddleX += 7;
+    }
+    
+    else if (leftPressed && paddleX > 0) {
+        paddleX -= 7;
     }
 
     x += dx;
     y += dy;
 }
+
+document.addEventListener("keydown", keyDownHandler, false);
+document.addEventListener("keyup", keyUpHandler, false);
 
 setInterval(draw, 10);
